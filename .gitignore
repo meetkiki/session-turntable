@@ -4,6 +4,7 @@ vf*
 .project
 .classpath
 .factorypath
+
 target/
 .settings/
 .springBeans
