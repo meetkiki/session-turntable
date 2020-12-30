@@ -6,22 +6,25 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Application {
 
-    public static void main(String[] args) throws IOException, URISyntaxException {
+    /**
+     * 价值一个亿的转盘代码
+     *
+     * @param args 啥都行
+     */
+    public static void main(String[] args) throws Exception {
         Stream<String> lines = readFileLines();
 
-        List<String> emails = lines.skip(2).map(splitStrToEmail()).filter(Objects::nonNull).distinct().collect(Collectors.toList());
+        List<String> emails = lines.skip(2).map(splitStrToEmail()).filter(filterFunction()).distinct().collect(Collectors.toList());
 
-        Collections.shuffle(emails);
-
+        Collections.shuffle(emails, new Random(1));
         for (int i = 0; i < emails.size(); i++) {
             System.out.println((i + 1) + " " + emails.get(i));
         }
@@ -36,9 +39,21 @@ public class Application {
         };
     }
 
+    private static Predicate<? super String> filterFunction() {
+        return email -> !skipList.contains(email);
+    }
+
     private static Stream<String> readFileLines() throws URISyntaxException, IOException {
         URI uri = Objects.requireNonNull(Application.class.getClassLoader().getResource("./td-backend-group.csv")).toURI();
         return Files.lines(Paths.get(uri), StandardCharsets.UTF_8);
     }
+
+
+    public static List<String> skipList = new ArrayList<>();
+
+    static {
+        skipList.add("min.tian@thoughtworks.com");
+    }
+
 
 }
